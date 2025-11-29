@@ -1,29 +1,50 @@
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rasta_ai_app/routes/routes.dart';
+import '../../../commons/common_methods/shared_preferences.dart';
 
 class SignUpController extends GetxController {
-  var isOwner = false.obs;
+  bool isLoading = false;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
   @override
   void onInit() {
     super.onInit();
   }
-   Future<void> saveUser({String? username, String? password}) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("username", username!);
-    await prefs.setString("password", password!);
+
+  // SAVE USER
+  Future<void> saveUser({
+    required String username,
+    required String password,
+  }) async {
+
+    // if (!formKey.currentState!.validate()) {
+    //   Get.snackbar("Error", "Please fill all fields");
+    //   return;
+    // }
+
+    isLoading = true;
+    update();
+
+    await PreferencesService.saveString("username", usernameController.text);
+    await PreferencesService.saveString("password", passwordController.text);
+    await PreferencesService.saveBool("isLoggedIn", true);
+
+    isLoading = false;
+    update();
+
+    Get.snackbar("Success", "User Saved Successfully");
+    Get.offAllNamed(AppRoutes.dashboard);
   }
 
-   Future<String?> getUsername() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString("username");
+
+  Map<String, dynamic> getUser() {
+    return {
+      "username": PreferencesService.getString("username"),
+      "password": PreferencesService.getString("password"),
+      "isLoggedIn": PreferencesService.getBool("isLoggedIn") ?? false,
+    };
   }
-
-   Future<String?> getPassword() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString("password");
-  }
-
-
 }

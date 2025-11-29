@@ -1,37 +1,27 @@
-import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-
 import '../../../commons/common_methods/shared_preferences.dart';
 import '../../../routes/routes.dart';
 
 class SplashController extends GetxController {
   @override
-  void onReady() {
-    precacheImage(const AssetImage("assets/images/splashIcon.png"), Get.context!);
-    super.onReady();
-  }
-
-  @override
   void onInit() {
     super.onInit();
-    navigateAfterSplash();
+    Future.delayed(const Duration(seconds: 2), () {
+      _checkLogin();
+    });
   }
 
-  var isSuccess = false.obs;
-  double opacity = 0;
-  double scale = 0.6;
-  bool? navigateAfterSplash() {
-    String? userName = PreferencesService.getString('userName');
-    String? passWord = PreferencesService.getString('passWord');
+  void _checkLogin() {
+    String? username = PreferencesService.getString('userName');
+    String? password = PreferencesService.getString('passWord');
 
-
-    if (userName!.isNotEmpty &&
-        passWord!.isNotEmpty) {
-      return true;
+    if (username != null &&
+        username.isNotEmpty &&
+        password != null &&
+        password.isNotEmpty) {
+      Get.offAllNamed(AppRoutes.dashboard);
     } else {
       Get.offAllNamed(AppRoutes.signup);
-
-      return false;
     }
   }
 }

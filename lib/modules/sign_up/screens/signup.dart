@@ -7,66 +7,108 @@ import '../controller/sign_up_controller.dart';
 class SignUpPage extends StatelessWidget {
   SignUpPage({super.key});
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  final TextEditingController usernameController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:  GetBuilder<SignUpController>(builder: (controller) {
-        return Padding(
-            padding: const EdgeInsets.all(18.0),
-            child: Form(
-              key: formKey,
-              child: Column(
-                children: [
-                  // Username
-                  TextFormField(
-                    controller: usernameController,
-                    decoration: const InputDecoration(
-                      labelText: "Username",
-                      border: OutlineInputBorder(),
-                    ),
-                    validator: (v) =>
-                    v!.isEmpty ? "Enter username" : null,
+      body: GetBuilder<SignUpController>(
+        builder: (controller) {
+          return Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.black, Colors.black12],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                width: 380,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.20),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.3),
                   ),
-
-                  const SizedBox(height: 20),
-
-                  // Password
-                  TextFormField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: "Password",
-                      border: OutlineInputBorder(),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 30,
+                      color: Colors.black26,
+                      offset: Offset(0, 10),
                     ),
-                    validator: (v) =>
-                    v!.isEmpty ? "Enter password" : null,
-                  ),
-
-                  const SizedBox(height: 25),
-
-                  // Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => controller.saveUser(username: "",password: ""),
-                      child: const Text(
-                        "Sign Up",
-                        style: TextStyle(fontSize: 18),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      "Sign Up",
+                      style: TextStyle(
+                        fontSize: 26,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  )
-                ],
+                    SizedBox(height: 25),
+
+                    TextFormField(
+                      controller: controller.usernameController,
+                      decoration: InputDecoration(
+                        // labelText: "Username",
+                        filled: true,
+                        hintText: "Username",
+                        fillColor: Colors.grey.shade100,
+                        prefixIcon: Icon(Icons.person),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      validator: (v) => v!.isEmpty ? "Enter username" : null,
+                    ),
+                    SizedBox(height: 15),
+                    TextFormField(
+                      controller: controller.passwordController,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        hintText: "Password",
+                        filled: true,
+                        fillColor: Colors.grey.shade100,
+                        prefixIcon: Icon(Icons.lock),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(50),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 22),
+
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black87,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 40,
+                          vertical: 10,
+                        ),
+                      ),
+                      onPressed: () {
+                        controller.saveUser(
+                          username: controller.usernameController.text,
+                          password: controller.passwordController.text,
+                        );
+                      },
+                      child: Text("Sign Up", style: TextStyle(fontSize: 18)),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
-        }
+        },
       ),
     );
   }

@@ -1,20 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:rasta_ai_app/modules/dashboard/controller/dashboard_controller.dart';
+import 'package:get/get.dart';
 
 class Dashboard extends StatelessWidget {
-  Dashboard({super.key});
+  const Dashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<DashBoardController>(
       builder: (controller) {
         return Scaffold(
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.black,
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (_) => controller.addDialog(context),
+              );
+            },
+            child: const Icon(Icons.add, color: Colors.white),
+          ),
           body: Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
               children: [
-                //---------------- SEARCH BAR ----------------
+                const SizedBox(height: 30),
+
+                // ---------------- SEARCH ----------------
                 TextField(
                   decoration: InputDecoration(
                     hintText: "Search courses...",
@@ -29,7 +41,7 @@ class Dashboard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                //---------------- CATEGORY FILTER ----------------
+                // ---------------- CATEGORY FILTER ----------------
                 ValueListenableBuilder(
                   valueListenable: controller.selectedCategory,
                   builder: (context, current, _) {
@@ -65,25 +77,24 @@ class Dashboard extends StatelessWidget {
 
                 const SizedBox(height: 12),
 
-                //---------------- FILTERED COURSE LIST ----------------
+                // ---------------- FILTERED LIST ----------------
                 Expanded(
                   child: ValueListenableBuilder(
                     valueListenable: controller.searchQuery,
-                    builder: (context, sQuery, _) {
+                    builder: (context, query, _) {
                       return ValueListenableBuilder(
                         valueListenable: controller.selectedCategory,
                         builder: (context, selected, _) {
-                          // Apply Filtering
-                          final filtered = courses.where((course) {
-                            bool matchSearch =
+                          final filtered = controller.courses.where((course) {
+                            final matchSearch =
                                 course["title"].toLowerCase().contains(
-                                  sQuery.toLowerCase(),
+                                  query.toLowerCase(),
                                 ) ||
                                 course["description"].toLowerCase().contains(
-                                  sQuery.toLowerCase(),
+                                  query.toLowerCase(),
                                 );
 
-                            bool matchCategory = selected == "All"
+                            final matchCategory = selected == "All"
                                 ? true
                                 : course["category"] == selected;
 
@@ -94,11 +105,23 @@ class Dashboard extends StatelessWidget {
                             itemCount: filtered.length,
                             itemBuilder: (context, index) {
                               final c = filtered[index];
-                              return DashboardCard(
-                                title: c["title"],
-                                description: c["description"],
-                                category: c["category"],
-                                score: c["score"],
+                              final originalIndex = controller.courses.indexOf(
+                                c,
+                              ); // find real index
+
+                              return GestureDetector(
+                                onDoubleTap: () {
+                                  controller.deleteDialog(
+                                    index: originalIndex,
+                                    context: context,
+                                  );
+                                },
+                                child: DashboardCard(
+                                  title: c["title"],
+                                  description: c["description"],
+                                  category: c["category"],
+                                  score: c["score"],
+                                ),
                               );
                             },
                           );
@@ -115,34 +138,6 @@ class Dashboard extends StatelessWidget {
     );
   }
 }
-
-//// --------------------- Courses Data ------------------------
-final List<Map<String, dynamic>> courses = [
-  {
-    "title": "Flutter Development",
-    "description": "Build beautiful native apps.",
-    "category": "Mobile",
-    "score": 92,
-  },
-  {
-    "title": "Python for AI",
-    "description": "Learn ML, DL & AI.",
-    "category": "Programming",
-    "score": 88,
-  },
-  {
-    "title": "UI/UX Design",
-    "description": "Design modern user interfaces.",
-    "category": "Design",
-    "score": 81,
-  },
-  {
-    "title": "Data Structures",
-    "description": "Master core DSA concepts.",
-    "category": "Computer Science",
-    "score": 95,
-  },
-];
 
 //// ------------------- Dashboard Card UI ---------------------
 class DashboardCard extends StatelessWidget {
@@ -161,70 +156,82 @@ class DashboardCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: [
-            Colors.red.withValues(alpha: 0.8),
-            Colors.red.withValues(alpha: 0.5),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 10,
-            offset: const Offset(3, 3),
-            color: Colors.red.withValues(alpha: 0.3),
-          ),
-        ],
-      ),
-
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          //---------------- TITLE ----------------
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
+    return GetBuilder<DashBoardController>(
+        builder: (controller) {
+          return  Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: LinearGradient(
+              colors: [
+                Colors.black.withValues(alpha: 0.8),
+                Colors.black12.withValues(alpha: 0.5),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ),
-
-          const SizedBox(height: 6),
-
-          //---------------- DESCRIPTION ----------------
-          Text(
-            description,
-            style: const TextStyle(color: Colors.white70, fontSize: 16),
-          ),
-
-          const SizedBox(height: 10),
-
-          //---------------- CATEGORY + SCORE ----------------
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Category: $category",
-                style: const TextStyle(color: Colors.white),
-              ),
-              Text(
-                "Score: $score",
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 10,
+                offset: const Offset(3, 3),
+                color: Colors.black.withValues(alpha: 0.3),
               ),
             ],
           ),
-        ],
-      ),
+
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                     // controller.editDialog();
+                    },
+                    icon: Icon(Icons.edit, color: Colors.white),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 6),
+
+              Text(
+                description,
+                style: const TextStyle(color: Colors.white70, fontSize: 16),
+              ),
+
+              const SizedBox(height: 10),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "Category: $category",
+                    style: const TextStyle(color: Colors.white),
+                  ),
+                  Text(
+                    "Score: $score",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }
     );
   }
 }
