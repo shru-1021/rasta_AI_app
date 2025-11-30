@@ -12,8 +12,8 @@ class SplashController extends GetxController {
   }
 
   void _checkLogin() {
-    String? username = PreferencesService.getString('userName');
-    String? password = PreferencesService.getString('passWord');
+    String? username = PreferencesService.getString('username');
+    String? password = PreferencesService.getString('password');
 
     if (username != null &&
         username.isNotEmpty &&
