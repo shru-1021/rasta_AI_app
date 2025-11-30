@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:rasta_ai_app/routes/routes.dart';
 
 import '../controller/dashboard_controller.dart';
 import 'dash_card_widget.dart';
@@ -75,6 +76,12 @@ class DashBody extends StatelessWidget {
                           itemBuilder: (context, index) {
                             final c = controller.filteredCourses[index];
                             return GestureDetector(
+                              onTap: () {
+                                Get.toNamed(
+                                  AppRoutes.courseDetails,
+                                  arguments: c,
+                                );
+                              },
                               onDoubleTap: () {
                                 deleteDialog(
                                   id: c.id ?? "",
