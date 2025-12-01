@@ -1,0 +1,29 @@
+# Flutter/Dart/Pub
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+ios/Pods/
+android/.gradle/
+android/app/build/
+*.iml
+
+# Remove build artifacts
+**/build/
+
+# VSCode
+.vscode/
+
+# IntelliJ
+.idea/
+
+# Generated files
+*.log
+*.lock
+*.class
+*.jar
+*.keystore
+*.so
+*.apk
+*.ipa
